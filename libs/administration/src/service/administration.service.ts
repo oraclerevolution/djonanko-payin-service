@@ -128,7 +128,7 @@ export class AdministrationService {
         new UnauthorizedException('Token dont exists');
       }
       this.httpService.axiosRef
-        .post(`${Conf.ADMIN_BASE_URL}/transactions`, payload, {
+        .post(`${Conf.TRANSACTIONS_BASE_URL}/transactions`, payload, {
           headers: {
             authenticationtoken: `${token}`,
           },
@@ -155,7 +155,7 @@ export class AdministrationService {
         new UnauthorizedException('Token dont exists');
       }
       this.httpService.axiosRef
-        .patch(`${Conf.ADMIN_BASE_URL}/transactions/update`, payload, {
+        .patch(`${Conf.TRANSACTIONS_BASE_URL}/transactions/update`, payload, {
           headers: {
             authenticationtoken: `${token}`,
           },
@@ -430,7 +430,7 @@ export class AdministrationService {
       }
       this.httpService.axiosRef
         .get(
-          `${Conf.ADMIN_BASE_URL}/transactions/get-transaction-by-reference`,
+          `${Conf.TRANSACTIONS_BASE_URL}/transactions/get-transaction-by-reference`,
           {
             headers: {
               authenticationtoken: `${token}`,
