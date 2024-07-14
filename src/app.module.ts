@@ -5,6 +5,7 @@ import { PayinModule } from './payin/payin.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -28,6 +29,12 @@ import { ScheduleModule } from '@nestjs/schedule';
       synchronize: true,
     }),
     ScheduleModule.forRoot(),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+      },
+    }),
     PayinModule,
   ],
   controllers: [AppController],

@@ -120,7 +120,7 @@ export class AdministrationService {
 
   createTransaction(apiKey: string, payload: any) {
     if (!isUUID(apiKey)) {
-      throw new UnauthorizedException('Invalid Payin service API key');
+      throw new UnauthorizedException('Invalid Transactions service API key');
     }
     return new Promise(async (resolve, reject) => {
       const token = await this.getAccessToken();
@@ -128,7 +128,7 @@ export class AdministrationService {
         new UnauthorizedException('Token dont exists');
       }
       this.httpService.axiosRef
-        .post(`${Conf.TRANSACTIONS_BASE_URL}/transactions`, payload, {
+        .post(`${Conf.ADMIN_BASE_URL}/transactions`, payload, {
           headers: {
             authenticationtoken: `${token}`,
           },
@@ -147,7 +147,7 @@ export class AdministrationService {
 
   updateTransaction(apiKey: string, transactionId: string, payload: any) {
     if (!isUUID(apiKey)) {
-      throw new UnauthorizedException('Invalid Payin service API key');
+      throw new UnauthorizedException('Invalid Transactions service API key');
     }
     return new Promise(async (resolve, reject) => {
       const token = await this.getAccessToken();
@@ -155,7 +155,7 @@ export class AdministrationService {
         new UnauthorizedException('Token dont exists');
       }
       this.httpService.axiosRef
-        .patch(`${Conf.TRANSACTIONS_BASE_URL}/transactions/update`, payload, {
+        .patch(`${Conf.ADMIN_BASE_URL}/transactions/update`, payload, {
           headers: {
             authenticationtoken: `${token}`,
           },
@@ -421,7 +421,7 @@ export class AdministrationService {
 
   getTransactionByReference(apiKey: string, reference: string): Promise<any> {
     if (!isUUID(apiKey)) {
-      throw new UnauthorizedException('Invalid Payin service API key');
+      throw new UnauthorizedException('Invalid Transactions service API key');
     }
     return new Promise(async (resolve, reject) => {
       const token = await this.getAccessToken();
@@ -430,7 +430,7 @@ export class AdministrationService {
       }
       this.httpService.axiosRef
         .get(
-          `${Conf.TRANSACTIONS_BASE_URL}/transactions/get-transaction-by-reference`,
+          `${Conf.ADMIN_BASE_URL}/transactions/get-transaction-by-reference`,
           {
             headers: {
               authenticationtoken: `${token}`,

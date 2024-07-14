@@ -21,11 +21,14 @@ import { MakeAbonnementDto } from './dto/make-abonnement.dto';
 import { Cron } from '@nestjs/schedule';
 import { PaymentRequestDto } from './enums/paiement-request.dto';
 import { ValidatePaymentDto } from './enums/validate-paiement.dto';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class PayinService {
   constructor(
     @InjectRepository(Payin) private readonly repository: Repository<Payin>,
+    @InjectQueue('payin-queue') private readonly payinQueue: Queue,
     private readonly administrationService: AdministrationService,
     private readonly configService: ConfigService,
   ) {}
@@ -59,6 +62,13 @@ export class PayinService {
       );
     }
     return `DJONANKO-${reference}`;
+  }
+
+  async addPayinJob(payload: MakePaiementDto) {
+    await this.payinQueue.add(payload, {
+      attempts: 2, //Nombre de tentatives en cas d'échec
+      backoff: 5000, //Délai avant de retenter (en millisecondes)
+    });
   }
 
   /**

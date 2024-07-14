@@ -7,6 +7,8 @@ import { AdministrationModule } from 'libs/administration/src/administration.mod
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { FullAuthStrategy } from 'src/full-auth-guard/full-auth.strategy';
+import { BullModule } from '@nestjs/bull';
+import { PayinJobProcessor } from './payin-job-processor';
 
 @Module({
   imports: [
@@ -18,11 +20,14 @@ import { FullAuthStrategy } from 'src/full-auth-guard/full-auth.strategy';
         expiresIn: '30d',
       },
     }),
+    BullModule.registerQueue({
+      name: 'payin-queue',
+    }),
     JwtModule,
     AdministrationModule,
   ],
   controllers: [PayinController],
-  providers: [PayinService, FullAuthStrategy],
+  providers: [PayinService, FullAuthStrategy, PayinJobProcessor],
   exports: [PayinService],
 })
 export class PayinModule {}

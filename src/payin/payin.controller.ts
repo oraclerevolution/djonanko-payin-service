@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { MakePaiementDto } from './dto/make-paiement.dto';
 import { PaymentInitDto } from './dto/paiement-init.dto';
 import { Payin } from './entities/paiement.entity';
@@ -9,6 +17,8 @@ import { MakeAbonnementDto } from './dto/make-abonnement.dto';
 import { PayinService } from './payin.service';
 import { ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { FullAuthGuard } from 'src/full-auth-guard/full-auth-guard.guard';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @UseGuards(FullAuthGuard)
 @ApiHeader({
@@ -18,7 +28,46 @@ import { FullAuthGuard } from 'src/full-auth-guard/full-auth-guard.guard';
 })
 @Controller('paiement')
 export class PayinController {
-  constructor(private readonly payinService: PayinService) {}
+  constructor(
+    private readonly payinService: PayinService,
+    @InjectQueue('payin-queue') private payinQueue: Queue,
+  ) {}
+
+  @Post('payin')
+  async createPayin(@Body() payload: MakePaiementDto): Promise<any> {
+    await this.payinService.addPayinJob(payload);
+    return { message: 'Transaction added to queue', date: new Date() };
+  }
+
+  @Get('queue/pending')
+  async getPendingJobs() {
+    const jobs = await this.payinQueue.getWaiting();
+    return jobs;
+  }
+
+  @Get('queue/active')
+  async getActiveJobs() {
+    const jobs = await this.payinQueue.getActive();
+    return jobs;
+  }
+
+  @Get('queue/completed')
+  async getCompletedJobs() {
+    const jobs = await this.payinQueue.getCompleted();
+    return jobs;
+  }
+
+  @Get('queue/failed')
+  async getFailedJobs() {
+    const jobs = await this.payinQueue.getFailed();
+    return jobs;
+  }
+
+  @Get('queue/job/:id')
+  async getJobById(@Param('id') id: string) {
+    const job = await this.payinQueue.getJob(id);
+    return job;
+  }
 
   @Post('initPayment')
   async initPayment(@Body() payload: MakePaiementDto): Promise<PaymentInitDto> {
